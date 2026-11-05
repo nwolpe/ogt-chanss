@@ -28,10 +28,15 @@ data_patients/OGT_English/      web-based task exports (JATOS study_result_* fol
 data_patients/OGT_Spanish/
 data_patients/OGT_Mandarin/
 control_demographics_sorted.csv reference-group demographics (subID, study_result_id, age, sex, hand, ...)
+control_demographics_additional.csv  demographics for NC_*/NH_* reference participants (subID, age, sex, education_years, testing_date)
 CHANSS_clinical_demog.csv       CHANSS clinical, cognitive and demographic database export
 paper/CHANSS_clinical_demog_filled_APLoad.xlsx   antipsychotic load (% BNF maximum) per patient
 analysis_outputs/ogt_patients_missing_clinical_data_corrected.csv   task-ID to clinical-ID corrections
 ```
+
+Reference participants are those tested before the data freeze of 1 May 2026 (`CONTROL_DATA_FREEZE_MS` in
+`analyze_ogt_groups.py`). Where a participant restarted the task, the attempt with the most completed test paths is
+used; `paper/outputs/shared/extra_control_attempts.csv` logs every attempt.
 
 AMI items in the CHANSS database are entered already apathy-scored (Completely true = 0 … Completely untrue = 4);
 the scripts use them without reversal.

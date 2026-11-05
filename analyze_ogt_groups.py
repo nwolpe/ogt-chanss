@@ -649,6 +649,43 @@ def load_patients_from_jatos(patient_jatos_dirs: list[Path]) -> list[Participant
     return patients
 
 
+ADDITIONAL_CONTROL_DEMOGRAPHICS_CSV = Path("control_demographics_additional.csv")
+EXTRA_CONTROL_ATTEMPT_LOG: list[dict[str, object]] = []
+# Analysis sample: reference participants tested before the data freeze (1 May 2026, UTC).
+CONTROL_DATA_FREEZE_MS = 1777593600000
+
+
+def control_attempt_timestamp_ms(study_dir: Path) -> int | None:
+    """Session start time (ms since epoch) stored with the participant ID in the JATOS export."""
+    for data_file in sorted(study_dir.glob("comp-result_*/data.txt")):
+        text = data_file.read_text(encoding="utf-8", errors="ignore").strip()
+        if not text or text.startswith("[") or text.startswith("{"):
+            continue
+        parts = re.split(r"[,\t]+", text)
+        if len(parts) > 1 and parts[1].strip().isdigit():
+            return int(parts[1].strip())
+    return None
+
+
+def normalise_extra_control_id(participant_id: str) -> str:
+    """NH_01, NH_001 and nh_1 all map to NH_001."""
+    match = re.match(r"^\s*(N[CH])[_-]?0*(\d+)\s*$", str(participant_id), flags=re.IGNORECASE)
+    if not match:
+        return str(participant_id).strip().upper()
+    return f"{match.group(1).upper()}_{int(match.group(2)):03d}"
+
+
+def load_additional_control_demographics(path: Path) -> dict[str, dict[str, str]]:
+    """Demographics for NC_*/NH_* controls (subID, age, sex, hand, education_years, testing_date)."""
+    if not path.exists():
+        return {}
+    return {
+        normalise_extra_control_id(row["subID"]): {k: (v or "").strip() for k, v in row.items()}
+        for row in read_csv_rows(path)
+        if row.get("subID", "").strip()
+    }
+
+
 def load_controls(control_csv: Path, control_dir: Path) -> list[ParticipantRoutes]:
     rows = select_control_rows(read_csv_rows(control_csv))
     controls: list[ParticipantRoutes] = []
@@ -674,8 +711,13 @@ def load_controls(control_csv: Path, control_dir: Path) -> list[ParticipantRoute
         selected_ids.add(canonicalize_patient_id(participant_id))
         selected_study_results.add(study_result_id)
 
-    # Add extra sparse-metadata controls that are not represented in the
-    # curated demographics CSV, limited to NC_* and NH_* IDs.
+    # Add extra controls (NC_* and NH_* IDs) that are not in the curated demographics CSV.
+    # Some participants restarted the task, leaving several study_result folders. Keep the
+    # attempt with the most completed test paths (ties: more practice paths, then the later
+    # attempt) and log the attempts that were skipped.
+    extra_demographics = load_additional_control_demographics(ADDITIONAL_CONTROL_DEMOGRAPHICS_CSV)
+    EXTRA_CONTROL_ATTEMPT_LOG.clear()
+    attempts: dict[str, list[dict[str, object]]] = defaultdict(list)
     for study_dir in sorted(control_dir.glob("study_result_*")):
         if not study_dir.is_dir() or study_dir.name in selected_study_results:
             continue
@@ -688,19 +730,68 @@ def load_controls(control_csv: Path, control_dir: Path) -> list[ParticipantRoute
         if canonical_id in selected_ids:
             continue
 
+        started_ms = control_attempt_timestamp_ms(study_dir)
+        if started_ms is not None and started_ms >= CONTROL_DATA_FREEZE_MS:
+            EXTRA_CONTROL_ATTEMPT_LOG.append({
+                "participant_id": canonical_id, "study_result_id": study_dir.name,
+                "practice_paths": "", "test_paths": "", "selected": 0, "excluded_after_data_freeze": 1,
+            })
+            continue
+
         try:
             practice_routes, test_routes = extract_control_routes(study_dir)
         except FileNotFoundError:
+            practice_routes, test_routes = [], []
+        attempts[canonical_id].append({
+            "participant_id": participant_id,
+            "study_dir": study_dir,
+            "metadata": metadata,
+            "practice_routes": practice_routes,
+            "test_routes": test_routes,
+        })
+
+    for canonical_id in sorted(attempts):
+        candidates = attempts[canonical_id]
+        best = max(
+            candidates,
+            key=lambda a: (
+                len(a["test_routes"]),
+                len(a["practice_routes"]),
+                int(str(a["study_dir"].name).rsplit("_", 1)[-1]),
+            ),
+        )
+        usable = len(best["test_routes"]) > 0
+        for a in candidates:
+            EXTRA_CONTROL_ATTEMPT_LOG.append({
+                "participant_id": canonical_id,
+                "study_result_id": a["study_dir"].name,
+                "practice_paths": len(a["practice_routes"]),
+                "test_paths": len(a["test_routes"]),
+                "selected": int(usable and a is best),
+                "excluded_after_data_freeze": 0,
+            })
+        if not usable:
+            warnings.warn(f"Control {canonical_id} has no completed test paths in any attempt; excluded.")
             continue
 
+        metadata = dict(best["metadata"])
+        demo = extra_demographics.get(normalise_extra_control_id(canonical_id))
+        if demo:
+            for key in ("age", "sex", "hand", "education_years", "testing_date"):
+                if demo.get(key, "") != "":
+                    metadata[key] = demo[key]
+        else:
+            warnings.warn(f"No demographic record for extra control {canonical_id}.")
+
+        study_dir = best["study_dir"]
         controls.append(
             ParticipantRoutes(
                 group="control",
-                participant_id=participant_id,
+                participant_id=str(best["participant_id"]),
                 source_id=study_dir.name,
                 source_platform="JATOS",
-                practice_routes=practice_routes,
-                test_routes=test_routes,
+                practice_routes=best["practice_routes"],
+                test_routes=best["test_routes"],
                 metadata=metadata,
             )
         )

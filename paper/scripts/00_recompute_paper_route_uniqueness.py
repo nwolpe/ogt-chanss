@@ -386,6 +386,9 @@ def main() -> None:
     patients = ns["load_patients"](PATIENT_OCTAL_DIR, PATIENT_JATOS_DIRS)
     participants = list(controls) + list(patients)
     print(f"Loaded {len(controls)} controls and {len(patients)} patients.")
+    attempt_log = ns.get("EXTRA_CONTROL_ATTEMPT_LOG", [])
+    if attempt_log:
+        pd.DataFrame(attempt_log).to_csv(OUTPUT_DIR / "extra_control_attempts.csv", index=False)
 
     uniqueness, route_df = compute_route_uniqueness(participants)
     route_df.to_csv(OUTPUT_DIR / "paper_route_uniqueness.csv", index=False)
