@@ -1,0 +1,22 @@
+# Participant data: never commit
+data_controls/
+data_patients/
+*.mat
+control_demographics*.csv
+control_demographics*.xls*
+CHANSS_clinical_demog*
+paper/CHANSS_clinical_demog*
+
+# Generated outputs (contain participant-level rows)
+analysis_outputs/
+paper/outputs/
+paper/figures/
+
+# Environment / OS
+__pycache__/
+*.pyc
+.DS_Store
+.Rhistory
+.RData
+.Rproj.user/
+.venv/
