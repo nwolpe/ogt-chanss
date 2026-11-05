@@ -1,9 +1,6 @@
 # Option generation in schizophrenia (OGT, CHANSS)
 
-Analysis code for:
-
-> Wolpe N, Wu C-L, Aymerich C, *et al.* **Narrow exploration of self-generated options relates to negative
-> symptoms and functioning in schizophrenia.** Manuscript submitted to *Schizophrenia Bulletin* (2026).
+Analysis code for a study of option generation in schizophrenia. The reference will be added on publication.
 
 The study uses the option generation task (OGT; Ang et al., *Curr Biol* 2018), in which participants draw as
 many different paths as possible between two points on a touchscreen. Data come from 150 patients with
@@ -107,9 +104,7 @@ reported in the paper.
 
 ## Citation
 
-If you use this code, please cite the paper (see `CITATION.cff`) and the original OGT method:
-Ang YS, Manohar S, Plant O, *et al.* Dopamine modulates option generation for behavior. *Curr Biol*
-2018;28:1561-1569.
+Citation details will be added on publication.
 
 ## Licence
 

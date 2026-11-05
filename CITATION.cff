@@ -1,19 +1,8 @@
 cff-version: 1.2.0
-message: "If you use this code, please cite the associated paper."
+message: "Citation details will be added on publication."
 title: "Option generation in schizophrenia: analysis code"
 authors:
   - family-names: Wolpe
     given-names: Noham
     affiliation: "Tel Aviv University"
 license: MIT
-preferred-citation:
-  type: article
-  title: "Narrow exploration of self-generated options relates to negative symptoms and functioning in schizophrenia"
-  authors:
-    - family-names: Wolpe
-      given-names: Noham
-    - family-names: Fernandez-Egea
-      given-names: Emilio
-  journal: "Schizophrenia Bulletin"
-  year: 2026
-  notes: "Submitted; full author list in the manuscript."
