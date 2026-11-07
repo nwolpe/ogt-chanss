@@ -74,7 +74,7 @@ format_fisher <- function(tab) {
 patient_site <- function(platform, subject_id) {
   case_when(
     platform == "OGT_Mandarin" | grepl("^CH", subject_id) ~ "China",
-    platform == "OGT_Spanish" ~ "Spain",
+    platform == "OGT_Spanish" | grepl("^C[378]", subject_id) ~ "Spain",  # Barcelona, Bilbao, Santander
     platform %in% c("OGT_English", "OCTAL") | grepl("^C", subject_id) ~ "UK",
     TRUE ~ "Unknown"
   )

@@ -85,7 +85,7 @@ rows <- s2 %>%
     site = case_when(
       group == "control" ~ "Control",
       source_platform == "OGT_Mandarin" | grepl("^CH", cid) ~ "China",
-      source_platform == "OGT_Spanish" ~ "Spain",
+      source_platform == "OGT_Spanish" | grepl("^C[378]", cid) ~ "Spain",
       TRUE ~ "UK"
     ),
     same_frame_as_controls = anisotropy < 1.3

@@ -72,7 +72,7 @@ d <- s2 %>%
   mutate(pid = toupper(trimws(participant_id)),
          cid = coalesce(toupper(trimws(co$participant_id_corrected))[match(pid, toupper(trimws(co$participant_id)))], pid),
          site = case_when(source_platform == "OGT_Mandarin" | grepl("^CH", cid) ~ "China",
-                          source_platform == "OGT_Spanish" ~ "Spain", TRUE ~ "UK")) %>%
+                          source_platform == "OGT_Spanish" | grepl("^C[378]", cid) ~ "Spain", TRUE ~ "UK")) %>%
   left_join(clin, by = c("cid" = "ID"))
 
 task_vars <- c(uniqueness_resid = "Residualised uniqueness", roaming = "Roaming entropy",

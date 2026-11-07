@@ -64,7 +64,7 @@ gs = fig.add_gridspec(2, 2, width_ratios=[1, 1.15], hspace=0.42, wspace=0.42)
 
 # A: uniqueness by patient site, healthy reference group shown for context
 ax = fig.add_subplot(gs[0, 0])
-groups = ["Healthy\nreference", "UK\n(n = 87)", "Spain\n(n = 28)", "China\n(n = 35)"]
+groups = ["Healthy\nreference"] + [f"{s}\n(n = {(P.site == s).sum()})" for s in ["UK", "Spain", "China"]]
 vals = [Ct.test_uniqueness_mean, P[P.site == "UK"].test_uniqueness_mean, P[P.site == "Spain"].test_uniqueness_mean,
         P[P.site == "China"].test_uniqueness_mean]
 strip(ax, groups, vals, [SITE_COL[k] for k in ["Controls", "UK", "Spain", "China"]], "Mean route uniqueness (log scale)", log=True)

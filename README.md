@@ -64,6 +64,7 @@ Run everything from the repository root (`bash run_all.sh`), or step by step:
 | 7 | `paper/scripts/02_section2_motor_adjusted_uniqueness.R` | Motor-residualised uniqueness; reference-group GLM | `paper/outputs/section2/` |
 | 8 | `paper/scripts/03_section3_cognitive_mechanisms.R` | Component correlations, Shapley R² (combined sample), attenuation | `paper/outputs/section3/` |
 | 9 | `paper/scripts/07_cca_mechanisms_clinical.R` | Canonical correlation analyses with within-site permutations | `paper/outputs/cca/` |
+| 9b | `paper/scripts/07b_cca_canonical_scores.R` | Patient scores on the first canonical dimension; distribution and influence diagnostics | `paper/outputs/cca/` |
 | 10 | `paper/scripts/08_reference_pool_sensitivity.py` | Uniqueness with alternative reference sets | `paper/outputs/revision/` |
 | 11 | `paper/scripts/09_revision_statistics.py` | Within-patient models, FDR, TOST, Shapley by group, cluster stability, site descriptives | `paper/outputs/revision/` |
 | 12 | `paper/scripts/10_revision_figures.py` | Figures 2, 4 and S1 | `paper/outputs/revision/figures/` |
@@ -91,6 +92,7 @@ in Figure 1C–F.
 | Table S4 | `09_revision_statistics.py` (`R4_clinical_correlations.csv`, `R6_clinical_multivariable.csv`) |
 | Table S5 | `09_revision_statistics.py` (`R7_shapley_by_group.csv`) |
 | Table S6 | `07_cca_mechanisms_clinical.R` (`cca_dimensions.csv`, `cca_omnibus.csv`) |
+| Figure S3 | `07b_cca_canonical_scores.R` (`figureS3_cca_dim1_scores`, `cca_dim1_distribution_diagnostics.csv`) |
 | Table S7 | `09_revision_statistics.py` (`R8_cluster_stability.csv`) |
 | Component–clinical partial correlations | `09_revision_statistics.py` (`R13_component_clinical_partial.csv`) |
 | Fluency equivalence (TOST) | `09_revision_statistics.py` (`R1_fluency_equivalence.csv`) |

@@ -10,6 +10,7 @@ main analyses.
 
 from __future__ import annotations
 
+import re
 import csv
 import math
 from collections import Counter
@@ -180,7 +181,8 @@ def patient_site(row: dict[str, object]) -> str:
     subject_id = str(row.get("clinical_lookup_id", row.get("participant_id", ""))).upper()
     if platform == "OGT_Mandarin" or subject_id.startswith("CH"):
         return "China"
-    if platform == "OGT_Spanish":
+    # Spanish sites: Barcelona (C3), Bilbao (C7; English-language task), Santander (C8)
+    if platform == "OGT_Spanish" or re.match(r"^C[378]", subject_id):
         return "Spain"
     if platform in {"OGT_English", "OCTAL"} or subject_id.startswith("C"):
         return "UK"

@@ -107,7 +107,8 @@ d["cid"] = [cmap.get(p.upper().strip(), p.upper().strip()) for p in d["participa
 d = d.merge(clin_df, left_on="cid", right_on="ID", how="left").merge(med, on="ID", how="left")
 pat = d["group"].eq("patient")
 d["site"] = np.select([~pat, d["source_platform"].eq("OGT_Mandarin") | d["cid"].str.startswith("CH"),
-                       d["source_platform"].eq("OGT_Spanish")], ["Control", "China", "Spain"], "UK")
+                       d["source_platform"].eq("OGT_Spanish") | d["cid"].astype(str).str.match(r"^C[378]")],  # Barcelona, Bilbao, Santander
+                      ["Control", "China", "Spain"], "UK")
 d["age_all"] = np.where(pat, d["age_clin"], num(d["age"]))
 sex_ctrl = d["sex"].astype(str).str.lower().map({"female": 0, "f": 0, "male": 1, "m": 1, "0": 0, "1": 1})
 d["male"] = np.where(pat, d["sex_clin"], sex_ctrl)
